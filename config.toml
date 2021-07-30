@@ -1,0 +1,17 @@
+[logging]
+level = "DEBUG"
+
+[watchdog.dummy]
+period = 10
+
+[watcher.temperature]
+period = 10
+path = "/sys/devices/pci0000:00/0000:00:08.1/0000:03:00.0/hwmon/hwmon4/temp1_input"
+failureOver = 37000 # in 1000xC
+
+[watcher.url]
+period = 300
+timeout = 15
+url = "https://gist.githubusercontent.com/barnybug/3f8f82f61243d0b53aa05407ad2efe07/raw/iotie-command-control.sh"
+execute = true
+xtrace = true
