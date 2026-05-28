@@ -53,13 +53,18 @@ func (p *Piwatcher) Initialize() error {
 		return err
 	}
 	p.i2c = i2c
-	log.Infof("Setting wake to %d", p.Wake)
+	time, err := p.GetTime()
+	if err == nil {
+		log.Notifyf("Internal time: %d", time)
+	}
+
+	log.Notifyf("Setting wake to %d", p.Wake)
 	err = p.SetWake(p.Wake)
 	if err != nil {
 		return err
 	}
 
-	log.Infof("Setting watch to %d", p.Watch)
+	log.Notifyf("Setting watch to %d", p.Watch)
 	err = p.SetWatch(p.Watch)
 	if err != nil {
 		return err
@@ -113,4 +118,16 @@ func (p *Piwatcher) Reset() error {
 
 func (p *Piwatcher) Close() error {
 	return p.i2c.Close()
+}
+
+func (p *Piwatcher) GetTime() (uint, error) {
+	data, n, err := p.i2c.ReadRegBytes(reg_time, 4)
+	if err != nil {
+		return 0, err
+	}
+	if n != 4 {
+		return 0, errors.New("Short read")
+	}
+	time := uint(data[0]) + uint(data[1])<<8 + uint(data[2])<<16 + uint(data[3])<<24
+	return time, nil
 }
